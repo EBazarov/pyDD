@@ -3,8 +3,6 @@
 @author: Ardalan MEHRANI <ardalan77400@gmail.com>
 @brief:
 
-
-
         self.params = {
             "host": self.host,
             "port": self.port,
@@ -43,7 +41,7 @@ class AbstractDDCalls(object):
         self.port = port
 
         dd = DD(self.host, port=self.port)
-        dd.set_return_format(dd.RETURN_PYTHON)
+        dd.set_return_format(dd.RETURN_JSON)
         self.dd = dd
 
     def create_service(self, sname, model, description, mllib, service_parameters_input,
