@@ -5,8 +5,6 @@
 
 """
 
-import os
-import logging
 import requests
 
 DD_TIMEOUT = 86400  # 24h (86400 sec) call maximum :)
@@ -23,7 +21,6 @@ API_METHODS_URL = {
 
 class DD(object):
     """HTTP requests to the DeepDetect server
-
     """
 
     # return types
@@ -64,31 +61,31 @@ class DD(object):
         else:
             return None
 
-    def get(self, method, params=None):
+    def get(self, method, json=None, params=None):
         """GET to DeepDetect server """
         url = self.__ddurl + method
-        r = requests.get(url=url, json=params, timeout=DD_TIMEOUT)
+        r = requests.get(url=url, json=json, params=params, timeout=DD_TIMEOUT)
         r.raise_for_status()
         return self.__return_data(r)
 
-    def put(self, method, params):
+    def put(self, method, json=None, params=None):
         """PUT request to DeepDetect server"""
         url = self.__ddurl + method
-        r = requests.put(url=url, json=params, timeout=DD_TIMEOUT)
+        r = requests.put(url=url, json=json, params=params, timeout=DD_TIMEOUT)
         r.raise_for_status()
         return self.__return_data(r)
 
-    def post(self, method, params):
+    def post(self, method, json=None, params=None):
         """POST request to DeepDetect server"""
         url = self.__ddurl + method
-        r = requests.post(url=url, json=params, timeout=DD_TIMEOUT)
+        r = requests.post(url=url, json=json, params=params, timeout=DD_TIMEOUT)
         r.raise_for_status()
         return self.__return_data(r)
 
-    def delete(self, method, params):
+    def delete(self, method, json=None, params=None):
         """DELETE request to DeepDetect server"""
         url = self.__ddurl + method
-        r = requests.delete(url=url, json=params, timeout=DD_TIMEOUT)
+        r = requests.delete(url=url, json=json, params=params, timeout=DD_TIMEOUT)
         r.raise_for_status()
         return self.__return_data(r)
 
@@ -111,14 +108,14 @@ class DD(object):
         parameters_mllib -- dict ML library parameters
         parameters_output -- dict of output parameters
         """
-        params = {"description": description,
-                  "mllib": mllib,
-                  "type": mltype,
-                  "parameters": {"input": parameters_input,
-                                 "mllib": parameters_mllib,
-                                 "output": parameters_output},
-                  "model": model}
-        return self.put(self.__urls["services"] + '/%s' % sname, params)
+        data = {"description": description,
+                "mllib": mllib,
+                "type": mltype,
+                "parameters": {"input": parameters_input,
+                               "mllib": parameters_mllib,
+                               "output": parameters_output},
+                "model": model}
+        return self.put(self.__urls["services"] + '/%s' % sname, json=data)
 
     def get_service(self, sname):
         """
@@ -135,10 +132,8 @@ class DD(object):
         sname -- service name as a resource
         clear -- 'full','lib' or 'mem', optionally clears model repository data
         """
-        params = None
-        if clear:
-            params = {"clear": clear}
-        return self.delete(self.__urls["services"] + '/%s' % sname, params)
+        data = {"clear": clear} if clear else None
+        return self.delete(self.__urls["services"] + '/%s' % sname, json=data)
 
     # API train
     def post_train(self, sname, data, parameters_input, parameters_mllib, parameters_output, async=True):
@@ -152,13 +147,13 @@ class DD(object):
         parameters_mllib -- dict ML library parameters
         parameters_output -- dict of output parameters
         """
-        params = {"service": sname,
-                  "async": async,
-                  "parameters": {"input": parameters_input,
-                                 "mllib": parameters_mllib,
-                                 "output": parameters_output},
-                  "data": data}
-        return self.post(self.__urls["train"], params)
+        data = {"service": sname,
+                "async": async,
+                "parameters": {"input": parameters_input,
+                               "mllib": parameters_mllib,
+                               "output": parameters_output},
+                "data": data}
+        return self.post(self.__urls["train"], json=data)
 
     def get_train(self, sname, job=1, timeout=0, measure_hist=False):
         """
@@ -174,7 +169,7 @@ class DD(object):
                   "timeout": str(timeout)}
         if measure_hist:
             params["parameters.output.measure_hist"] = measure_hist
-        return self.get(self.__urls["train"], params)
+        return self.get(self.__urls["train"], params=params)
 
     def delete_train(self, sname, job=1):
         """
@@ -185,7 +180,7 @@ class DD(object):
         """
         params = {"service": sname,
                   "job": str(job)}
-        return self.delete(self.__urls["train"], params)
+        return self.delete(self.__urls["train"], params=params)
 
     # API predict
     def post_predict(self, sname, data, parameters_input, parameters_mllib, parameters_output):
@@ -198,12 +193,12 @@ class DD(object):
         parameters_mllib -- dict ML library parameters
         parameters_output -- dict of output parameters
         """
-        params = {"service": sname,
-                  "parameters": {"input": parameters_input,
-                                 "mllib": parameters_mllib,
-                                 "output": parameters_output},
-                  "data": data}
-        return self.post(self.__urls["predict"], params)
+        data = {"service": sname,
+                "parameters": {"input": parameters_input,
+                               "mllib": parameters_mllib,
+                               "output": parameters_output},
+                "data": data}
+        return self.post(self.__urls["predict"], json=data)
 
 # test
 if __name__ == '__main__':
