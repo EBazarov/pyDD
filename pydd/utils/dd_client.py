@@ -67,28 +67,28 @@ class DD(object):
     def get(self, method, params=None):
         """GET to DeepDetect server """
         url = self.__ddurl + method
-        r = requests.get(url=url, params=params, timeout=DD_TIMEOUT)
+        r = requests.get(url=url, json=params, timeout=DD_TIMEOUT)
         r.raise_for_status()
         return self.__return_data(r)
 
     def put(self, method, params):
         """PUT request to DeepDetect server"""
         url = self.__ddurl + method
-        r = requests.put(url=url, params=params, timeout=DD_TIMEOUT)
+        r = requests.put(url=url, json=params, timeout=DD_TIMEOUT)
         r.raise_for_status()
         return self.__return_data(r)
 
     def post(self, method, params):
         """POST request to DeepDetect server"""
         url = self.__ddurl + method
-        r = requests.post(url=url, params=params, timeout=DD_TIMEOUT)
+        r = requests.post(url=url, json=params, timeout=DD_TIMEOUT)
         r.raise_for_status()
         return self.__return_data(r)
 
     def delete(self, method, params):
         """DELETE request to DeepDetect server"""
         url = self.__ddurl + method
-        r = requests.delete(url=url, params=params, timeout=DD_TIMEOUT)
+        r = requests.delete(url=url, json=params, timeout=DD_TIMEOUT)
         r.raise_for_status()
         return self.__return_data(r)
 
